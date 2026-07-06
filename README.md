@@ -32,17 +32,25 @@ Rather than treating capital gains and ordinary income in isolation, Decumulate 
 
 ### 3. Social Security Taxability & "The Tax Torpedo"
 The tool mathematically models the **Combined Income Prosperity Test** (often known as the Social Security Tax Torpedo):
-$$\text{Combined Income} = \text{Adjusted Gross Income (AGI)} + \text{Ordinary Dividends} + \left(50\% \times \text{Social Security Benefit}\right)$$
+
+```text
+Combined Income = Adjusted Gross Income (AGI) + Ordinary Dividends + (50% × Social Security Benefit)
+```
+
 Depending on Single or MFJ thresholds ($25k/$32k and $34k/$44k), the model dynamically renders 0%, 50%, or 85% of Social Security benefits as taxable ordinary income. This enables planners to visually identify and avoid the high-marginal-rate cliffs caused by overlapping tax phases.
 
 ### 4. Required Minimum Distributions (RMDs)
 Starting at age 73, the engine queries the **IRS Uniform Lifetime Table** divisor:
-$$\text{RMD Amount} = \frac{\text{Prior Year-End Traditional Balance}}{\text{Uniform Lifetime Divisor}}$$
+
+```text
+RMD Amount = Prior Year-End Traditional Balance / Uniform Lifetime Divisor
+```
+
 This forced distribution is injected into ordinary income, letting users observe how massive pre-tax balances can trigger involuntary tax-bracket spikes later in life.
 
 ### 5. Automated Heuristic Liquidation Sequencing
 When net cash flow is negative, Decumulate executes an intelligent, tax-aware harvesting order:
-1.  **Taxable Brokerage:** Draws from brokerage first, dynamically calculating the **Gain Ratio** ($\frac{\text{Balance} - \text{Basis}}{\text{Balance}}$) to isolate capital gains tax liabilities iteratively.
+1.  **Taxable Brokerage:** Draws from brokerage first, dynamically calculating the **Gain Ratio** (computed as `(Balance - Basis) / Balance`) to isolate capital gains tax liabilities iteratively.
 2.  **Early-Withdrawal Penalty Avoidance (Optional):** If checked and under age 59½, the engine intelligently draws from tax-free **Roth balances** first to bypass the IRS 10% early withdrawal penalty. If unchecked, it harvests from **Traditional** assets, calculating and compounding the 10% penalty on the fly.
 3.  **Standard Sequencing:** Draws from Traditional (fully taxable) once brokerage is exhausted, and finally depletes Roth as a last resort to allow maximum tax-free compounding time.
 
