@@ -10,7 +10,7 @@ import {
   ChevronRight, HelpCircle, ArrowRight, DollarSign, 
   Users, Briefcase, GraduationCap, ChevronLeft, MousePointer2,
   History, Layers, Heart, Key, ShieldCheck,
-  Plus, Trash2, Zap, ArrowDownToLine, X
+  Plus, Trash2, Zap, ArrowDownToLine, X, Sliders, LayoutDashboard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
@@ -359,15 +359,11 @@ export default function App() {
     return initialParams as SimulationParams;
   });
 
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'education' | 'methodology' | 'legacy'>(() => {
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'inputs' | 'education' | 'methodology' | 'legacy'>(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get('tab');
-    if (tab === 'dashboard' || tab === 'education' || tab === 'methodology' || tab === 'legacy') return tab as any;
+    if (tab === 'dashboard' || tab === 'inputs' || tab === 'education' || tab === 'methodology' || tab === 'legacy') return tab as any;
     
-    // Default to education on mobile, dashboard on desktop
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      return 'education';
-    }
     return 'dashboard';
   });
 
@@ -378,12 +374,17 @@ export default function App() {
   const [lockedAge, setLockedAge] = useState<number | null>(null);
   const [editingEvent, setEditingEvent] = useState<{ age: number } | null>(null);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [mobileAgeLimit, setMobileAgeLimit] = useState<number>(85);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeTab]);
 
   const getXAxisTicks = (data: any[], isMobile: boolean) => {
     if (!data || data.length === 0) return undefined;
@@ -413,6 +414,55 @@ export default function App() {
   };
 
   const results = useMemo(() => runSimulation(params), [params]);
+
+  const mobileYears = useMemo(() => {
+    return results.years.filter(y => y.age <= mobileAgeLimit);
+  }, [results.years, mobileAgeLimit]);
+
+  const CustomXAxisTick = (props: any) => {
+    const { x, y, payload } = props;
+    const is85 = payload.value === 85 && mobileAgeLimit === 85;
+    const is100 = payload.value === 100 && mobileAgeLimit === 100;
+    const isInteractive = is85 || is100;
+    
+    return (
+      <g 
+        transform={`translate(${x},${y})`}
+        onClick={(e) => {
+          if (isInteractive) {
+            e.stopPropagation();
+            setMobileAgeLimit(is85 ? 100 : 85);
+          }
+        }}
+        className={isInteractive ? "cursor-pointer" : ""}
+        style={{ pointerEvents: 'all' }}
+      >
+        {isInteractive && (
+          <rect 
+            x={-24} 
+            y={-2} 
+            width={48} 
+            height={20} 
+            fill={is85 ? "rgba(242, 125, 38, 0.08)" : "rgba(99, 102, 241, 0.08)"} 
+            stroke={is85 ? "rgba(242, 125, 38, 0.2)" : "rgba(99, 102, 241, 0.2)"}
+            strokeWidth={1}
+            rx={4}
+            className="animate-pulse"
+          />
+        )}
+        <text
+          x={0}
+          y={12}
+          textAnchor="middle"
+          fill={is85 ? "#F27D26" : is100 ? "#6366F1" : "#141414"}
+          fontSize={isInteractive ? 11 : 10}
+          fontWeight={isInteractive ? "bold" : "normal"}
+        >
+          {is85 ? "85 ➜" : is100 ? "100 ↩" : payload.value}
+        </text>
+      </g>
+    );
+  };
 
   const defaultYearData = useMemo(() => 
     results.years.find(y => y.age === params.currentAge) || results.years[0]
@@ -629,14 +679,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen md:h-screen md:overflow-hidden bg-[#F5F5F4] text-[#141414] font-sans flex flex-col md:flex-row">
-      {/* Mobile Header with Branding */}
-      <div className="md:hidden bg-white border-b border-[#141414]/10 px-4 py-2.5 flex items-center gap-1.5">
-        <Calculator className="w-4 h-4 text-[#141414]" />
-        <h1 className="text-sm font-bold tracking-tight">Decumulate</h1>
-      </div>
-
-      {/* Mobile Carousel - Always at top on mobile */}
-      <div className="md:hidden bg-[#F5F5F4] border-b border-[#141414]/10 shadow-sm">
+      {/* Mobile Carousel - Only shown on mobile when activeTab is 'dashboard' */}
+      <div className={cn("md:hidden bg-[#F5F5F4] border-b border-[#141414]/10 shadow-sm", activeTab === 'dashboard' ? "block" : "hidden")}>
         <div className="relative h-[63vh] min-h-[590px] max-h-[700px] overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
@@ -649,29 +693,37 @@ export default function App() {
             >
               {carouselIndex === 0 && (
                 <div className="bg-white p-3 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
-                  <div className="mb-1">
-                    <h3 className="text-xs font-bold tracking-tight">Projected Asset Balances</h3>
-                    <p className="text-[9px] text-[#141414]/50">Growth over time (Tap or drag chart to inspect details)</p>
+                  <div className="mb-1 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <h3 className="text-xs font-bold tracking-tight">Projected Asset Balances</h3>
+                      <p className="text-[9px] text-[#141414]/50">Growth over time (Tap or drag chart to inspect)</p>
+                    </div>
+                    <button 
+                      onClick={() => setMobileAgeLimit(mobileAgeLimit === 85 ? 100 : 85)}
+                      className="px-2 py-0.5 bg-[#141414]/5 hover:bg-[#141414]/10 active:bg-[#141414]/15 rounded-full text-[9px] font-bold text-[#141414]/70 transition-all flex items-center gap-1 border border-[#141414]/5 shrink-0"
+                    >
+                      Age: <span className="text-[#F27D26] font-extrabold">{mobileAgeLimit === 85 ? "30-85" : "30-100"}</span>
+                    </button>
                   </div>
                   <div className="flex-1 min-h-0">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <LineChart 
-                        data={results.years}
+                        data={mobileYears}
                         onMouseMove={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
                         onClick={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
                         onTouchMove={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
@@ -681,10 +733,10 @@ export default function App() {
                           dataKey="age" 
                           type="number" 
                           domain={['dataMin', 'dataMax']} 
-                          ticks={getXAxisTicks(results.years, true)}
+                          ticks={getXAxisTicks(mobileYears, true)}
                           axisLine={false} 
                           tickLine={false} 
-                          tick={{fontSize: 10}} 
+                          tick={<CustomXAxisTick />}
                         />
                         <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10}} tickFormatter={(v) => `$${v/1000000}M`} />
                         {params.enableGapYear && (
@@ -743,26 +795,37 @@ export default function App() {
               )}
               {carouselIndex === 2 && (
                 <div className="bg-white p-3 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
-                  <h3 className="text-xs font-bold tracking-tight mb-1">Annual Tax Obligation</h3>
+                  <div className="mb-1 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <h3 className="text-xs font-bold tracking-tight">Annual Tax Obligation</h3>
+                      <p className="text-[9px] text-[#141414]/50">Yearly tax paid (Tap chart to inspect)</p>
+                    </div>
+                    <button 
+                      onClick={() => setMobileAgeLimit(mobileAgeLimit === 85 ? 100 : 85)}
+                      className="px-2 py-0.5 bg-[#141414]/5 hover:bg-[#141414]/10 active:bg-[#141414]/15 rounded-full text-[9px] font-bold text-[#141414]/70 transition-all flex items-center gap-1 border border-[#141414]/5 shrink-0"
+                    >
+                      Age: <span className="text-[#F27D26] font-extrabold">{mobileAgeLimit === 85 ? "30-85" : "30-100"}</span>
+                    </button>
+                  </div>
                   <div className="flex-1 min-h-0">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart 
-                        data={results.years}
+                        data={mobileYears}
                         onMouseMove={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
                         onClick={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
                         onTouchMove={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
@@ -776,12 +839,12 @@ export default function App() {
                           dataKey="age" 
                           type="number" 
                           domain={['dataMin', 'dataMax']} 
-                          ticks={getXAxisTicks(results.years, true)}
+                          ticks={getXAxisTicks(mobileYears, true)}
                           axisLine={false} 
                           tickLine={false} 
-                          tick={{fontSize: 10}} 
+                          tick={<CustomXAxisTick />}
                         />
-                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10}} tickFormatter={(v) => `$${v/1000}k`} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10}} tickFormatter={(v) => `$${v/100}k`} />
                         {params.enableGapYear && (
                           <ReferenceArea 
                             {...({
@@ -803,26 +866,37 @@ export default function App() {
               )}
               {carouselIndex === 3 && (
                 <div className="bg-white p-3 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
-                  <h3 className="text-xs font-bold tracking-tight mb-1">RMD Impact</h3>
+                  <div className="mb-1 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <h3 className="text-xs font-bold tracking-tight">RMD Impact</h3>
+                      <p className="text-[9px] text-[#141414]/50">Required distributions starting age 73</p>
+                    </div>
+                    <button 
+                      onClick={() => setMobileAgeLimit(mobileAgeLimit === 85 ? 100 : 85)}
+                      className="px-2 py-0.5 bg-[#141414]/5 hover:bg-[#141414]/10 active:bg-[#141414]/15 rounded-full text-[9px] font-bold text-[#141414]/70 transition-all flex items-center gap-1 border border-[#141414]/5 shrink-0"
+                    >
+                      Age: <span className="text-[#F27D26] font-extrabold">{mobileAgeLimit === 85 ? "70-85" : "70-100"}</span>
+                    </button>
+                  </div>
                   <div className="flex-1 min-h-0">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <LineChart 
-                        data={results.years.filter(y => y.age >= 70)}
+                        data={mobileYears.filter(y => y.age >= 70)}
                         onMouseMove={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
                         onClick={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
                         onTouchMove={(e: any) => {
                           if (e && e.activeLabel) {
-                            const dataPoint = results.years.find(y => y.age === e.activeLabel);
+                            const dataPoint = mobileYears.find(y => y.age === e.activeLabel);
                             if (dataPoint) setHoveredData(dataPoint);
                           }
                         }}
@@ -832,10 +906,10 @@ export default function App() {
                           dataKey="age" 
                           axisLine={false} 
                           tickLine={false} 
-                          tick={{fontSize: 10}} 
-                          ticks={getXAxisTicks(results.years.filter(y => y.age >= 70), true)}
+                          tick={<CustomXAxisTick />}
+                          ticks={getXAxisTicks(mobileYears.filter(y => y.age >= 70), true)}
                         />
-                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10}} tickFormatter={(v) => `$${v/1000}k`} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10}} tickFormatter={(v) => `$${v/100}k`} />
                         <ReferenceLine x={73} stroke="#141414" strokeDasharray="3 3" opacity={0.3} label={{ value: 'RMD', position: 'insideTopLeft', fontSize: 8, fill: '#141414' }} />
                         <Line type="monotone" dataKey="rmdAmount" stroke="#F27D26" strokeWidth={2} dot={false} />
                       </LineChart>
@@ -878,7 +952,10 @@ export default function App() {
       </div>
 
       {/* Sidebar - Inputs */}
-      <aside className="w-full md:w-80 md:h-full md:overflow-y-auto bg-white border-r border-[#141414]/10 p-6">
+      <aside className={cn(
+        "w-full md:w-80 md:h-full md:overflow-y-auto bg-white border-r border-[#141414]/10 p-6 pb-24 md:pb-6",
+        activeTab === 'inputs' ? "block" : "hidden md:block"
+      )}>
         <div className="hidden md:flex items-center gap-2 mb-8">
           <Calculator className="w-6 h-6 text-[#141414]" />
           <h1 className="text-xl font-bold tracking-tight">Decumulate</h1>
@@ -1158,8 +1235,11 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 md:h-full md:overflow-y-auto p-4 md:p-8">
-        <nav className="sticky top-0 z-40 bg-[#F5F5F4]/80 backdrop-blur-md flex gap-4 md:gap-8 mb-8 border-b border-[#141414]/10 overflow-x-auto whitespace-nowrap scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pt-4">
+      <main className={cn(
+        "flex-1 md:h-full md:overflow-y-auto p-4 md:p-8 pb-24 md:pb-8",
+        (activeTab === 'education' || activeTab === 'methodology' || activeTab === 'legacy') ? "block" : "hidden md:block"
+      )}>
+        <nav className="hidden md:flex sticky top-0 z-40 bg-[#F5F5F4]/80 backdrop-blur-md gap-4 md:gap-8 mb-8 border-b border-[#141414]/10 overflow-x-auto whitespace-nowrap scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pt-4">
           <button 
             onClick={() => setActiveTab('dashboard')}
             className={cn(
@@ -2398,6 +2478,92 @@ export default function App() {
           <EventModal />
         </AnimatePresence>
       </main>
+
+      {/* Mobile Sticky Bottom Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#141414]/10 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] px-4 py-2 flex flex-col gap-1.5 pb-safe">
+        {/* Branding & Current Tab Name */}
+        <div className="flex items-center justify-between border-b border-[#141414]/5 pb-1 px-1">
+          <div className="flex items-center gap-1.5">
+            <Calculator className="w-3.5 h-3.5 text-[#141414]" />
+            <span className="text-[11px] font-extrabold tracking-tight text-[#141414]">Decumulate</span>
+          </div>
+          <span className="text-[8px] font-bold text-[#141414]/40 uppercase tracking-widest">
+            {activeTab === 'dashboard' && 'Dashboard'}
+            {activeTab === 'inputs' && 'Inputs & Strategy'}
+            {activeTab === 'education' && 'Education'}
+            {activeTab === 'methodology' && 'Methodology'}
+            {activeTab === 'legacy' && 'Legacy & Succession'}
+          </span>
+        </div>
+
+        {/* Tab Buttons */}
+        <div className="grid grid-cols-5 gap-1">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={cn(
+              "flex flex-col items-center justify-center py-1 rounded-xl transition-all",
+              activeTab === 'dashboard' 
+                ? "text-[#F27D26] bg-[#F27D26]/5 font-bold" 
+                : "text-[#141414]/50 hover:text-[#141414]/80"
+            )}
+          >
+            <LayoutDashboard className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">Dashboard</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('inputs')}
+            className={cn(
+              "flex flex-col items-center justify-center py-1 rounded-xl transition-all",
+              activeTab === 'inputs' 
+                ? "text-[#F27D26] bg-[#F27D26]/5 font-bold" 
+                : "text-[#141414]/50 hover:text-[#141414]/80"
+            )}
+          >
+            <Sliders className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">Inputs</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('education')}
+            className={cn(
+              "flex flex-col items-center justify-center py-1 rounded-xl transition-all",
+              activeTab === 'education' 
+                ? "text-[#F27D26] bg-[#F27D26]/5 font-bold" 
+                : "text-[#141414]/50 hover:text-[#141414]/80"
+            )}
+          >
+            <GraduationCap className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">Education</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('methodology')}
+            className={cn(
+              "flex flex-col items-center justify-center py-1 rounded-xl transition-all",
+              activeTab === 'methodology' 
+                ? "text-[#F27D26] bg-[#F27D26]/5 font-bold" 
+                : "text-[#141414]/50 hover:text-[#141414]/80"
+            )}
+          >
+            <Info className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">Method</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('legacy')}
+            className={cn(
+              "flex flex-col items-center justify-center py-1 rounded-xl transition-all",
+              activeTab === 'legacy' 
+                ? "text-[#F27D26] bg-[#F27D26]/5 font-bold" 
+                : "text-[#141414]/50 hover:text-[#141414]/80"
+            )}
+          >
+            <Heart className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">Legacy</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
