@@ -172,17 +172,17 @@ const NumericInput = ({
 
 const MobileDetailSection = ({ data }: { data: YearData | null }) => {
   return (
-    <div className="mt-3 pt-3 border-t border-[#141414]/5 min-h-[180px]">
+    <div className="mt-2 pt-2 border-t border-[#141414]/5 h-[180px] shrink-0 overflow-y-auto scrollbar-thin flex flex-col">
       {data ? (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#141414]/40">Age {data.age}</span>
-              <span className="text-xs font-bold">{data.year}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#141414]/40">Age {data.age}</span>
+              <span className="text-xs font-bold text-[#141414]">{data.year}</span>
             </div>
             <div className="text-right">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#141414]/40">Total Assets</span>
-              <p className="text-sm font-bold text-[#F27D26]">{formatCurrency(data.totalBalance)}</p>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#141414]/40">Total Assets</span>
+              <p className="text-xs font-bold text-[#F27D26]">{formatCurrency(data.totalBalance)}</p>
             </div>
           </div>
 
@@ -190,84 +190,84 @@ const MobileDetailSection = ({ data }: { data: YearData | null }) => {
             <div className="p-1.5 bg-[#141414]/5 rounded-lg overflow-hidden flex flex-col">
               <div className="flex items-center gap-1 mb-0.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#141414]" />
-                <p className="text-[7px] text-[#141414]/50 uppercase tracking-wider">Trad</p>
+                <p className="text-[8px] text-[#141414]/60 font-bold uppercase tracking-wider">Traditional</p>
               </div>
-              <p className="text-[9px] font-bold truncate">{formatCurrency(data.traditionalBalance)}</p>
+              <p className="text-[11px] font-bold text-[#141414] truncate">{formatCurrency(data.traditionalBalance)}</p>
             </div>
             <div className="p-1.5 bg-[#F27D26]/5 rounded-lg overflow-hidden flex flex-col">
               <div className="flex items-center gap-1 mb-0.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#F27D26]" />
-                <p className="text-[7px] text-[#F27D26]/50 uppercase tracking-wider">Roth</p>
+                <p className="text-[8px] text-[#F27D26]/80 font-bold uppercase tracking-wider">Roth</p>
               </div>
-              <p className="text-[9px] font-bold text-[#F27D26] truncate">{formatCurrency(data.rothBalance)}</p>
+              <p className="text-[11px] font-bold text-[#F27D26] truncate">{formatCurrency(data.rothBalance)}</p>
             </div>
             <div className="p-1.5 bg-[#6366F1]/5 rounded-lg overflow-hidden flex flex-col">
               <div className="flex items-center gap-1 mb-0.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#6366F1]" />
-                <p className="text-[7px] text-[#6366F1]/50 uppercase tracking-wider">Brok</p>
+                <p className="text-[8px] text-[#6366F1]/80 font-bold uppercase tracking-wider">Brokerage</p>
               </div>
-              <p className="text-[9px] font-bold text-[#6366F1] truncate">{formatCurrency(data.brokerageBalance)}</p>
+              <p className="text-[11px] font-bold text-[#6366F1] truncate">{formatCurrency(data.brokerageBalance)}</p>
             </div>
-            <div className="p-1.5 bg-transparent rounded-lg overflow-hidden border-2 border-dotted border-[#141414]/20 flex flex-col">
+            <div className="p-1.5 bg-emerald-50 rounded-lg overflow-hidden flex flex-col border border-emerald-100">
               <div className="flex items-center gap-1 mb-0.5">
-                <div className="w-1.5 h-1.5 rounded-full border border-dotted border-[#141414]" />
-                <p className="text-[7px] text-[#141414]/50 uppercase tracking-wider">Purchasing Power</p>
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                <p className="text-[8px] text-emerald-700 font-bold uppercase tracking-wider">Purchasing Power</p>
               </div>
-              <p className="text-[9px] font-bold text-[#141414]/60 truncate">$1 = ${data.purchasingPower.toFixed(2)}</p>
+              <p className="text-[11px] font-bold text-emerald-700 truncate">{(data.purchasingPower * 100).toFixed(0)}% of Today</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 pt-2 border-t border-[#141414]/5">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1 pt-1.5 border-t border-[#141414]/5 text-[11px]">
             <div className="flex justify-between items-center">
-              <span className="text-[9px] text-[#141414]/50">Income</span>
-              <span className="text-[9px] font-bold">{formatCurrency(data.income + data.rmdAmount + data.withdrawnFromTraditional + data.ssIncome + data.qualifiedDividends + data.ordinaryDividends + (data.events?.filter((e: any) => e.type === 'inflow').reduce((acc: number, e: any) => acc + Math.abs(e.amount), 0) || 0))}</span>
+              <span className="text-[#141414]/50">Income</span>
+              <span className="font-bold text-[#141414]">{formatCurrency(data.income + data.rmdAmount + data.withdrawnFromTraditional + data.ssIncome + data.qualifiedDividends + data.ordinaryDividends + (data.events?.filter((e: any) => e.type === 'inflow').reduce((acc: number, e: any) => acc + Math.abs(e.amount), 0) || 0))}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[9px] text-[#141414]/50">Spending</span>
-              <span className="text-[9px] font-bold text-[#F27D26]">{formatCurrency(data.spending)}</span>
+              <span className="text-[#141414]/50">Spending</span>
+              <span className="font-bold text-[#F27D26]">{formatCurrency(data.spending)}</span>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0.5 col-span-2">
               <div className="flex justify-between items-center">
-                <span className="text-[9px] text-[#141414]/50">Taxes</span>
-                <span className="text-[9px] font-bold text-red-500">{formatCurrency(data.taxPaid)}</span>
+                <span className="text-[#141414]/50">Taxes & Penalties</span>
+                <span className="font-bold text-red-500">{formatCurrency(data.taxPaid)}</span>
               </div>
-              <div className="flex flex-wrap items-center gap-x-2 ml-2 opacity-60">
-                <span className="text-[8px] font-medium text-[#141414]/40">Ord: {formatCurrency(data.ordinaryTaxPaid)}</span>
-                {data.capitalGainsTaxPaid > 0 && <span className="text-[8px] font-medium text-[#141414]/40">LTCG: {formatCurrency(data.capitalGainsTaxPaid)}</span>}
+              <div className="flex flex-wrap items-center gap-x-2 pl-1.5 opacity-80 text-[9px] font-medium text-[#141414]/60">
+                <span>Ordinary: {formatCurrency(data.ordinaryTaxPaid)}</span>
+                {data.capitalGainsTaxPaid > 0 && <span>CapGains: {formatCurrency(data.capitalGainsTaxPaid)}</span>}
                 {data.earlyWithdrawalPenalty > 0 && (
-                  <span className="text-[8px] font-bold text-red-500/80 flex items-center gap-0.5">
+                  <span className="font-bold text-red-500 flex items-center gap-0.5">
                     <ShieldAlert className="w-2 h-2" />
-                    Pen: {formatCurrency(data.earlyWithdrawalPenalty)}
+                    Penalty: {formatCurrency(data.earlyWithdrawalPenalty)}
                   </span>
                 )}
               </div>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-[9px] text-[#141414]/50 font-bold">Net</span>
-              <span className={`text-[9px] font-bold ${data.income + data.rmdAmount + data.withdrawnFromTraditional + data.ssIncome + data.qualifiedDividends + data.ordinaryDividends + (data.events?.filter((e: any) => e.type === 'inflow').reduce((acc: number, e: any) => acc + Math.abs(e.amount), 0) || 0) - data.spending - data.taxPaid >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+            <div className="flex justify-between items-center col-span-2 py-0.5 bg-[#141414]/3 px-1 rounded">
+              <span className="text-[#141414]/50 font-bold">Annual Cash Flow Net</span>
+              <span className={`font-bold ${data.income + data.rmdAmount + data.withdrawnFromTraditional + data.ssIncome + data.qualifiedDividends + data.ordinaryDividends + (data.events?.filter((e: any) => e.type === 'inflow').reduce((acc: number, e: any) => acc + Math.abs(e.amount), 0) || 0) - data.spending - data.taxPaid >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                 {formatCurrency(data.income + data.rmdAmount + data.withdrawnFromTraditional + data.ssIncome + data.qualifiedDividends + data.ordinaryDividends + (data.events?.filter((e: any) => e.type === 'inflow').reduce((acc: number, e: any) => acc + Math.abs(e.amount), 0) || 0) - data.spending - data.taxPaid)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[9px] text-[#141414]/40 italic">Eff. Rate</span>
-              <span className="text-[9px] font-bold text-[#141414]/60">{data.effectiveRate.toFixed(1)}%</span>
+              <span className="text-[#141414]/40 italic">Effective Rate</span>
+              <span className="font-bold text-[#141414]/70">{data.effectiveRate.toFixed(1)}%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[9px] text-[#141414]/40 italic">Marginal</span>
-              <span className="text-[9px] font-bold text-[#141414]/60">{data.marginalRate.toFixed(0)}%</span>
+              <span className="text-[#141414]/40 italic">Marginal Rate</span>
+              <span className="font-bold text-[#141414]/70">{data.marginalRate.toFixed(0)}%</span>
             </div>
           </div>
 
           {data.events && data.events.length > 0 && (
-            <div className="pt-2 border-t border-[#141414]/5 space-y-1">
-              <p className="text-[8px] font-bold text-[#141414]/40 uppercase tracking-widest mb-1">Yearly Events</p>
+            <div className="pt-1.5 border-t border-[#141414]/5 space-y-1">
+              <p className="text-[9px] font-bold text-[#141414]/40 uppercase tracking-widest mb-0.5">Yearly Events</p>
               {data.events.map(e => (
-                <div key={e.id} className="flex justify-between items-center p-1.5 bg-[#141414]/5 rounded-lg">
+                <div key={e.id} className="flex justify-between items-center p-1 bg-[#141414]/5 rounded text-[10px]">
                   <div className="flex items-center gap-1">
                     {e.type === 'expense' ? <ArrowDownToLine className="w-2.5 h-2.5 text-red-500" /> : <Zap className="w-2.5 h-2.5 text-green-600" />}
-                    <span className="text-[9px] font-bold truncate max-w-[80px]">{e.name}</span>
+                    <span className="font-bold truncate max-w-[120px]">{e.name}</span>
                   </div>
-                  <span className={cn("text-[8px] font-bold", e.amount < 0 ? "text-red-500" : "text-green-600")}>
+                  <span className={cn("font-bold", e.amount < 0 ? "text-red-500" : "text-green-600")}>
                     {formatCurrency(Math.abs(e.amount))}
                   </span>
                 </div>
@@ -275,15 +275,15 @@ const MobileDetailSection = ({ data }: { data: YearData | null }) => {
             </div>
           )}
 
-          <div className="pt-2 border-t border-[#141414]/5 space-y-1">
+          <div className="pt-1.5 border-t border-[#141414]/5 space-y-0.5 text-[9px]">
             {data.traditional401kContribution > 0 && (
-              <div className="flex justify-between items-center text-[7px] text-[#141414]/50">
+              <div className="flex justify-between items-center text-[#141414]/50">
                 <span>Trad. 401k Contribution</span>
                 <span className="font-bold">{formatCurrency(data.traditional401kContribution)}</span>
               </div>
             )}
             {data.megaRothContribution > 0 && (
-              <div className="flex justify-between items-center text-[7px] text-[#F27D26]/70">
+              <div className="flex justify-between items-center text-[#F27D26]/70">
                 <span>Mega Backdoor Roth</span>
                 <span className="font-bold">{formatCurrency(data.megaRothContribution)}</span>
               </div>
@@ -294,7 +294,7 @@ const MobileDetailSection = ({ data }: { data: YearData | null }) => {
               
               if (netSavings >= 0) {
                 return brokerageSurplus > 0 ? (
-                  <div className="flex justify-between items-center text-[7px] text-[#6366F1]/70">
+                  <div className="flex justify-between items-center text-[#6366F1]/70">
                     <span>Brokerage Investment</span>
                     <span className="font-bold">{formatCurrency(brokerageSurplus)}</span>
                   </div>
@@ -302,7 +302,7 @@ const MobileDetailSection = ({ data }: { data: YearData | null }) => {
               }
               
               return (
-                <p className="text-[8px] text-[#141414]/40 italic leading-tight mt-1">
+                <p className="text-[#141414]/40 italic leading-tight mt-0.5">
                   Gap funded via: {[
                     data.withdrawnFromBrokerage > 0 ? "Brokerage" : null,
                     data.withdrawnFromTraditional > 0 ? "Traditional" : null,
@@ -311,19 +311,14 @@ const MobileDetailSection = ({ data }: { data: YearData | null }) => {
                 </p>
               );
             })()}
-            {data.earlyWithdrawalPenalty > 0 && (
-              <div className="mt-1 flex items-center gap-1 text-red-500">
-                <ShieldAlert className="w-2 h-2" />
-                <span className="text-[8px] font-bold uppercase tracking-wider">Penalty: {formatCurrency(data.earlyWithdrawalPenalty)}</span>
-              </div>
-            )}
           </div>
         </div>
       ) : (
-        <div className="h-full flex items-center justify-center bg-[#141414]/5 rounded-lg border border-dashed border-[#141414]/10">
-          <div className="text-center">
-            <MousePointer2 className="w-4 h-4 text-[#141414]/20 mx-auto mb-1" />
-            <p className="text-[10px] text-[#141414]/40 italic">Tap chart for details</p>
+        <div className="h-full flex items-center justify-center bg-[#141414]/3 rounded-xl border border-dashed border-[#141414]/10 p-3">
+          <div className="text-center py-4">
+            <MousePointer2 className="w-4 h-4 text-[#141414]/20 mx-auto mb-1 animate-bounce" />
+            <p className="text-xs font-bold text-[#141414]/60">Tap or drag on chart</p>
+            <p className="text-[10px] text-[#141414]/40 mt-0.5 leading-normal">to inspect yearly decumulation details</p>
           </div>
         </div>
       )}
@@ -634,9 +629,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen md:h-screen md:overflow-hidden bg-[#F5F5F4] text-[#141414] font-sans flex flex-col md:flex-row">
+      {/* Mobile Header with Branding */}
+      <div className="md:hidden bg-white border-b border-[#141414]/10 px-4 py-2.5 flex items-center gap-1.5">
+        <Calculator className="w-4 h-4 text-[#141414]" />
+        <h1 className="text-sm font-bold tracking-tight">Decumulate</h1>
+      </div>
+
       {/* Mobile Carousel - Always at top on mobile */}
       <div className="md:hidden bg-[#F5F5F4] border-b border-[#141414]/10 shadow-sm">
-        <div className="relative h-[480px] overflow-hidden">
+        <div className="relative h-[63vh] min-h-[590px] max-h-[700px] overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={carouselIndex}
@@ -644,13 +645,13 @@ export default function App() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              className="h-full p-4"
+              className="h-full p-2.5 pb-9"
             >
               {carouselIndex === 0 && (
-                <div className="bg-white p-4 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
-                  <div className="mb-2">
-                    <h3 className="text-sm font-bold tracking-tight">Projected Asset Balances</h3>
-                    <p className="text-[10px] text-[#141414]/50">Growth over time</p>
+                <div className="bg-white p-3 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
+                  <div className="mb-1">
+                    <h3 className="text-xs font-bold tracking-tight">Projected Asset Balances</h3>
+                    <p className="text-[9px] text-[#141414]/50">Growth over time (Tap or drag chart to inspect details)</p>
                   </div>
                   <div className="flex-1 min-h-0">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
@@ -710,39 +711,39 @@ export default function App() {
               )}
               {carouselIndex === 1 && (
                 <div className="grid grid-cols-2 gap-3 h-full">
-                  <div className="bg-white p-4 rounded-2xl border border-[#141414]/5 shadow-sm flex flex-col justify-center">
-                    <div className="flex items-center gap-2 text-[#141414]/50 mb-1">
-                      <ShieldAlert className="w-3 h-3" />
+                  <div className="bg-white p-3.5 rounded-2xl border border-[#141414]/5 shadow-sm flex flex-col justify-center">
+                    <div className="flex items-center gap-1.5 text-[#141414]/50 mb-1">
+                      <ShieldAlert className="w-3.5 h-3.5 text-[#F27D26]" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">Total RMD</span>
                     </div>
-                    <div className="text-lg font-bold">{formatCurrency(results.totalRmdPaid)}</div>
+                    <div className="text-lg font-extrabold text-[#141414] tabular-nums">{formatCurrency(results.totalRmdPaid)}</div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-[#141414]/5 shadow-sm flex flex-col justify-center">
-                    <div className="flex items-center gap-2 text-[#141414]/50 mb-1">
-                      <DollarSign className="w-3 h-3" />
+                  <div className="bg-white p-3.5 rounded-2xl border border-[#141414]/5 shadow-sm flex flex-col justify-center">
+                    <div className="flex items-center gap-1.5 text-[#141414]/50 mb-1">
+                      <DollarSign className="w-3.5 h-3.5 text-red-500" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">Total Tax</span>
                     </div>
-                    <div className="text-lg font-bold">{formatCurrency(results.totalTaxPaid)}</div>
+                    <div className="text-lg font-extrabold text-[#141414] tabular-nums">{formatCurrency(results.totalTaxPaid)}</div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-[#141414]/5 shadow-sm flex flex-col justify-center">
-                    <div className="flex items-center gap-2 text-[#141414]/50 mb-1">
-                      <Wallet className="w-3 h-3" />
+                  <div className="bg-white p-3.5 rounded-2xl border border-[#141414]/5 shadow-sm flex flex-col justify-center">
+                    <div className="flex items-center gap-1.5 text-[#141414]/50 mb-1">
+                      <Wallet className="w-3.5 h-3.5 text-[#6366F1]" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">Final Bal</span>
                     </div>
-                    <div className="text-lg font-bold">{formatCurrency(results.finalBalance)}</div>
+                    <div className="text-lg font-extrabold text-[#141414] tabular-nums">{formatCurrency(results.finalBalance)}</div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-[#141414]/5 shadow-sm flex flex-col justify-center">
-                    <div className="flex items-center gap-2 text-[#141414]/50 mb-1">
-                      <Calendar className="w-3 h-3" />
+                  <div className="bg-white p-3.5 rounded-2xl border border-[#141414]/5 shadow-sm flex flex-col justify-center">
+                    <div className="flex items-center gap-1.5 text-[#141414]/50 mb-1">
+                      <Calendar className="w-3.5 h-3.5 text-emerald-600" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">RMD Start</span>
                     </div>
-                    <div className="text-lg font-bold">Age 73</div>
+                    <div className="text-lg font-extrabold text-[#141414] tabular-nums">Age 73</div>
                   </div>
                 </div>
               )}
               {carouselIndex === 2 && (
-                <div className="bg-white p-4 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
-                  <h3 className="text-sm font-bold tracking-tight mb-2">Annual Tax Obligation</h3>
+                <div className="bg-white p-3 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
+                  <h3 className="text-xs font-bold tracking-tight mb-1">Annual Tax Obligation</h3>
                   <div className="flex-1 min-h-0">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart 
@@ -801,8 +802,8 @@ export default function App() {
                 </div>
               )}
               {carouselIndex === 3 && (
-                <div className="bg-white p-4 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
-                  <h3 className="text-sm font-bold tracking-tight mb-2">RMD Impact</h3>
+                <div className="bg-white p-3 rounded-2xl border border-[#141414]/5 shadow-sm h-full flex flex-col">
+                  <h3 className="text-xs font-bold tracking-tight mb-1">RMD Impact</h3>
                   <div className="flex-1 min-h-0">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <LineChart 
@@ -878,7 +879,7 @@ export default function App() {
 
       {/* Sidebar - Inputs */}
       <aside className="w-full md:w-80 md:h-full md:overflow-y-auto bg-white border-r border-[#141414]/10 p-6">
-        <div className="flex items-center gap-2 mb-8">
+        <div className="hidden md:flex items-center gap-2 mb-8">
           <Calculator className="w-6 h-6 text-[#141414]" />
           <h1 className="text-xl font-bold tracking-tight">Decumulate</h1>
         </div>
