@@ -670,6 +670,16 @@ export default function App() {
         
         newParams.ssAnnualBenefit = Math.round(estimatedBenefit / 500) * 500;
       }
+
+      // Smart proportional inflation rate adjustment when market scenario changes (Fisher Effect)
+      if (key === 'marketGrowthRate') {
+        const marketRate = parseFloat(value);
+        if (!isNaN(marketRate)) {
+          // Baseline: 7.0% nominal return -> 2.5% inflation. Slope ~0.22 based on long-term macro asset return correlation
+          const propInflation = Math.min(0.06, Math.max(0.015, 0.025 + (marketRate - 0.07) * 0.22));
+          newParams.inflationRate = Math.round(propInflation * 1000) / 1000;
+        }
+      }
       
       return newParams;
     });
@@ -1125,7 +1135,11 @@ export default function App() {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-medium">Market Scenario</label>
+                  <div className="flex items-center gap-1.5">
+                    <AppTooltip content="Nominal annual investment return before inflation. Adjusting this automatically updates the expected inflation rate proportionally based on macro return correlations (Fisher Effect).">
+                      <label className="block text-xs font-medium cursor-help border-b border-dotted border-[#141414]/10">Market Scenario</label>
+                    </AppTooltip>
+                  </div>
                   <span className={cn(
                     "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
                     params.marketGrowthRate <= 0.05 ? "bg-slate-200 text-slate-700" :
@@ -1148,18 +1162,24 @@ export default function App() {
                 />
                 <div className="flex justify-between text-[8px] font-bold text-[#141414]/30 uppercase tracking-tighter">
                   <span>3% Min</span>
-                  <span>Moderate</span>
+                  <span>Moderate (7%)</span>
                   <span>10% Max</span>
                 </div>
               </div>
-              <NumericInput 
-                value={params.inflationRate * 100}
-                onChange={(val) => handleParamChange('inflationRate', val / 100)}
-                label="Inflation Rate (%)"
-                prefix=""
-                indicatorColor="#141414"
-                indicatorStyle="hollow"
-              />
+              <div>
+                <NumericInput 
+                  value={params.inflationRate * 100}
+                  onChange={(val) => handleParamChange('inflationRate', val / 100)}
+                  label="Inflation Rate (%)"
+                  prefix=""
+                  indicatorColor="#141414"
+                  indicatorStyle="hollow"
+                  tooltip="Expected long-term annual Consumer Price Index (CPI) increase. Automatically adjusts proportionally when sliding the Market Scenario."
+                />
+                <p className="text-[9px] text-[#141414]/40 mt-1 italic">
+                  Real return: <span className="font-bold text-[#141414]/70">{((params.marketGrowthRate - params.inflationRate) * 100).toFixed(1)}%</span> (Nominal {(params.marketGrowthRate * 100).toFixed(1)}% − Inflation {(params.inflationRate * 100).toFixed(1)}%)
+                </p>
+              </div>
             </div>
           </section>
 

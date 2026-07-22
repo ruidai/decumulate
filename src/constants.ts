@@ -80,7 +80,7 @@ export const DEFAULT_PARAMS = {
   currentRothBalance: 0,
   currentIncome: 250000,
   annualSpending: 120000,
-  inflationRate: 0.03,
+  inflationRate: 0.025,
   marketGrowthRate: 0.07,
   gapYearStartAge: 55,
   gapYearDuration: 3,
