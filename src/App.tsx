@@ -1250,6 +1250,15 @@ export default function App() {
             Dashboard
           </button>
           <button 
+            onClick={() => setActiveTab(prev => prev === 'legacy' ? 'dashboard' : 'legacy')}
+            className={cn(
+              "pb-4 text-[10px] md:text-sm font-bold uppercase tracking-widest transition-colors shrink-0",
+              activeTab === 'legacy' ? "text-[#141414] border-b-2 border-[#141414]" : "text-[#141414]/40 hover:text-[#141414]"
+            )}
+          >
+            Legacy
+          </button>
+          <button 
             onClick={() => setActiveTab(prev => prev === 'education' ? 'dashboard' : 'education')}
             className={cn(
               "pb-4 text-[10px] md:text-sm font-bold uppercase tracking-widest transition-colors shrink-0",
@@ -1266,15 +1275,6 @@ export default function App() {
             )}
           >
             Methodology
-          </button>
-          <button 
-            onClick={() => setActiveTab(prev => prev === 'legacy' ? 'dashboard' : 'legacy')}
-            className={cn(
-              "pb-4 text-[10px] md:text-sm font-bold uppercase tracking-widest transition-colors shrink-0",
-              activeTab === 'legacy' ? "text-[#141414] border-b-2 border-[#141414]" : "text-[#141414]/40 hover:text-[#141414]"
-            )}
-          >
-            Legacy
           </button>
         </nav>
 
@@ -2512,6 +2512,19 @@ export default function App() {
           </button>
 
           <button
+            onClick={() => setActiveTab('legacy')}
+            className={cn(
+              "flex flex-col items-center justify-center py-1 rounded-xl transition-all",
+              activeTab === 'legacy' 
+                ? "text-[#F27D26] bg-[#F27D26]/5 font-bold" 
+                : "text-[#141414]/50 hover:text-[#141414]/80"
+            )}
+          >
+            <Heart className="w-5 h-5 mb-0.5" />
+            <span className="text-[9px] tracking-tight">Legacy</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('inputs')}
             className={cn(
               "flex flex-col items-center justify-center py-1 rounded-xl transition-all",
@@ -2548,19 +2561,6 @@ export default function App() {
           >
             <Info className="w-5 h-5 mb-0.5" />
             <span className="text-[9px] tracking-tight">Method</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('legacy')}
-            className={cn(
-              "flex flex-col items-center justify-center py-1 rounded-xl transition-all",
-              activeTab === 'legacy' 
-                ? "text-[#F27D26] bg-[#F27D26]/5 font-bold" 
-                : "text-[#141414]/50 hover:text-[#141414]/80"
-            )}
-          >
-            <Heart className="w-5 h-5 mb-0.5" />
-            <span className="text-[9px] tracking-tight">Legacy</span>
           </button>
         </div>
       </div>

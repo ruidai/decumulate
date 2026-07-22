@@ -76,7 +76,7 @@ export const DEFAULT_PARAMS = {
   retirementAge: 65,
   filingStatus: 'MFJ' as const,
   currentBrokerageBalance: 500000,
-  currentTraditionalBalance: 1500000,
+  currentTraditionalBalance: 500000,
   currentRothBalance: 0,
   currentIncome: 250000,
   annualSpending: 120000,
